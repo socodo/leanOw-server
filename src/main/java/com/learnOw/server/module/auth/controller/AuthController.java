@@ -1,9 +1,11 @@
 package com.learnOw.server.module.auth.controller;
 
 import com.learnOw.server.dto.response.ApiResponse;
+import com.learnOw.server.module.auth.dto.request.IntrospectRequest;
 import com.learnOw.server.module.auth.dto.request.LoginRequest;
 import com.learnOw.server.module.auth.dto.request.RegisterRequest;
 import com.learnOw.server.module.auth.dto.response.AuthResponse;
+import com.learnOw.server.module.auth.dto.response.IntrospectResponse;
 import com.learnOw.server.module.auth.service.AuthService;
 import com.learnOw.server.module.user.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +42,15 @@ public class AuthController {
         .code(1000)
         .message("Đăng ký thành công")
         .result(authService.register(request))
+        .build();
+  }
+
+  @Operation(summary = "Kiểm tra token", description = "API kiểm tra token có hợp lệ không")
+  @PostMapping("/introspect")
+  public ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) {
+    return ApiResponse.<IntrospectResponse>builder()
+        .code(1000)
+        .result(authService.introspect(request))
         .build();
   }
 }

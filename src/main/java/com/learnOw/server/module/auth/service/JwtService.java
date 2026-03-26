@@ -3,7 +3,10 @@ package com.learnOw.server.module.auth.service;
 import com.learnOw.server.module.user.model.User;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -41,6 +44,34 @@ public class JwtService {
 
     } catch (JOSEException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  public boolean verifyToken(String token) {
+    try {
+      SignedJWT signedJWT = SignedJWT.parse(token);
+      JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+
+      // Verify signature
+      if (!signedJWT.verify(verifier)) {
+        return false;
+      }
+
+      // Check expiration
+      Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+      return expirationTime != null && expirationTime.after(new Date());
+
+    } catch (JOSEException | ParseException e) {
+      return false;
+    }
+  }
+
+  public String getEmailFromToken(String token) {
+    try {
+      SignedJWT signedJWT = SignedJWT.parse(token);
+      return signedJWT.getJWTClaimsSet().getSubject();
+    } catch (ParseException e) {
+      return null;
     }
   }
 }

@@ -2,9 +2,11 @@ package com.learnOw.server.module.auth.service;
 
 import com.learnOw.server.exception.AppException;
 import com.learnOw.server.exception.ErrorCode;
+import com.learnOw.server.module.auth.dto.request.IntrospectRequest;
 import com.learnOw.server.module.auth.dto.request.LoginRequest;
 import com.learnOw.server.module.auth.dto.request.RegisterRequest;
 import com.learnOw.server.module.auth.dto.response.AuthResponse;
+import com.learnOw.server.module.auth.dto.response.IntrospectResponse;
 import com.learnOw.server.module.user.dto.response.UserResponse;
 import com.learnOw.server.module.user.mapper.UserMapper;
 import com.learnOw.server.module.user.model.User;
@@ -46,5 +48,10 @@ public class AuthService {
     user = userRepository.save(user);
 
     return userMapper.toUserResponse(user);
+  }
+
+  public IntrospectResponse introspect(IntrospectRequest request) {
+    boolean isValid = jwtService.verifyToken(request.getToken());
+    return IntrospectResponse.builder().valid(isValid).build();
   }
 }
